@@ -1,0 +1,62 @@
+Ebook:
+https://rest-apis-flask.teclado.com/docs/course_intro/
+
+Repository:
+https://github.com/tecladocode/rest-apis-flask-python
+
+
+----------------------------------------------------------------------------------------------------
+
+We want to create a virutal environment because if the app is going to be exported
+all the libs will be there and we dont need to install anything
+We are creating a virtual environment using:
+Python -m venv .venv
+using ctrl+shift+p we are selecting the python venv
+then open another terminal using ctrl J
+
+if doesnt work:
+Set-ExecutionPolicy Unrestricted -Force
+pip install virtualenv
+then try to activate it
+https://stackoverflow.com/questions/18713086/virtualenv-wont-activate-on-windows
+or in the folder .venv\Scripts\activate
+
+----------------------------------------------------------------------------------------------------
+1. then install requirments:
+pip install flask 
+
+2. then create a new python file called app.py
+its important to name it like so to run flask
+
+3. We also need to create a requirments.txt file, which will hold all the libraries that python will Unrestricted
+then we will create the image and run the needed dependencies through the requirments file.
+for an example the flask, flask-smorest, and python-dotenv
+
+4. We also want to create a file called .flaskenv
+which is a file that holds all the variables that needed for flask to run when it starts
+here we declare variables like:
+FLASK_APP = app
+FLASK_DEBUG = 1 - this allows the app to be restarted each time the code is changed
+
+5. Files:
+Models: the tables of the db, what columns should be and what the relations should be
+Resources = blueprints : the operations on each table
+Schemas: the deserialization and serialization of data.
+first create a model (so we will have a base for the db), then create a schema (so we know how to parse incoming/outgoing data)
+then create a resource(so we can have operations on the model), then register the blueprint into the apis
+
+model -> schema -> resource -> blueprint link to api
+
+Flask-Migrations - these are used when we develop our app and we change things in the the db. in order to not break the db
+we need to use db migrations.
+installation:
+pip install flask-migrate
+at the app - from flask-migrate import migrate
+
+flask-migrate is the connection between alembic and flask.
+do start -> flask db init (to init migrations files)
+then, delete the db, so alembic can create the tables and know how to provision them at later user.
+then -> flask db migrate (to create migration version)
+Then we can upgrate or downgrade versions using -> flask db upgrade (to upgrade to new db file)
+if we want to change things in the db, we make the changes, and then:
+flask db migrate -> flask db upgrade
