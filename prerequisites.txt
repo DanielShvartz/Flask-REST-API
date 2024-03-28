@@ -60,3 +60,24 @@ then -> flask db migrate (to create migration version)
 Then we can upgrate or downgrade versions using -> flask db upgrade (to upgrade to new db file)
 if we want to change things in the db, we make the changes, and then:
 flask db migrate -> flask db upgrade
+
+To use local virtual environment variables:
+create file named: .env
+
+when we switched from sqlite to postgres we needed to create a migration because it runs different commands
+
+also note that the deploymnet server dfoesnt run migrations, we need to create a file to run them
+create file docker-entrypoint.sh
+then add:
+
+#!/bin/sh
+this run the executable
+flask db upgrade
+so it goes to the lastest migration
+and then
+exec gunicorn --bind 0.0.0.0:80 "app:create_app()"
+to run the app
+
+then at the dockerfile:
+CMD ["/bin/bash", "docker-entrypoint.sh"]
+to tell docker to run the migration

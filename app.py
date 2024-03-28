@@ -13,6 +13,7 @@ from resources.users import blp as UserBluePrint
 from db import db
 import models # inside-> StoreModel and ItemModel.  The models are needed to be declared before the init of sqlalchemy so it will know which models are available
 import os
+from dotenv import load_dotenv
 
 """ 
 NOTE:
@@ -32,6 +33,7 @@ The data that we send to that address will be fowarded to the app """
 def create_app(db_url=None):
 
     app = Flask(__name__) # This creates a flask instance/app, allows us to also run the app
+    load_dotenv() # load environment variables
 
     # Register blueprints with the api
     app.config["PROPAGATE_EXCEPTIONS"] = True # if there is an exception - propagate it to the main app so we can see it

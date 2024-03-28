@@ -17,4 +17,5 @@ COPY . .
 RUN flask db upgrade
 
 # run flask with the ip of the host so it can be accessible
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:create_app()"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:create_app()"]
+CMD ["/bin/bash", "docker-entrypoint.sh"]
