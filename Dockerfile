@@ -16,5 +16,8 @@ RUN pip install -r requirements.txt && rm -rf /var/lib/lists/*
 # copy directory files to the container directory - in this case - /app
 COPY . .
 
+# THIS IS IMPORTANT TO RUN IF WE ARE DEPLOYING SO THE DB CAN BE REBUILT
+RUN flask db upgrade
+
 # run flask with the ip of the host so it can be accessible
 CMD ["flask", "run", "--host", "0.0.0.0"]
