@@ -8,7 +8,7 @@ WORKDIR /app
 # install dependencies
 # instead of installing flask each build we store it in a txt file which is cached. if a change occures it will rebuilt.
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade -r requirements.txt && rm -rf /var/lib/lists/*
+RUN pip install -r requirements.txt && rm -rf /var/lib/lists/*
 
 # copy directory files to the container directory - in this case - /app
 COPY . .
