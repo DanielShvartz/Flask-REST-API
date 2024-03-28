@@ -27,3 +27,6 @@ class ItemModel(db.Model):
 
 # A one-to-many relationship - one entity (or record) in a table is associated with multiple entities (or records) in another table.
 # For an example we can have one store, and 5 items that have the store_id of that same store, so we can say they relate to the same store.
+
+
+print('check')
