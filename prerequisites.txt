@@ -99,7 +99,7 @@ if needed:
 to add a redis instance take the redis url and add it to the .env
 
 to run the worker: 
-docker run --name=api_worker api_local sh -c -it "rq worker -u redis_url queue_name"
+docker run --name=api_worker -it api_local sh -c"rq worker -u redis_url queue_name"
 -u - where to connection, and the queue name.
 we need to run both the worker from redis, which will handle the emails sending
 and the api it self.
