@@ -38,7 +38,7 @@ def create_app(db_url=None):
     load_dotenv() # load environment variables
 
     connection = redis.from_url(os.getenv("REDIS_URL")) # create a connection to redis
-    app.queue = Queue('Emails', connection=connection)
+    app.queue = Queue('emails', connection=connection)
 
     # Register blueprints with the api
     app.config["PROPAGATE_EXCEPTIONS"] = True # if there is an exception - propagate it to the main app so we can see it

@@ -54,10 +54,8 @@ class RegisterUser(MethodView):
         # at this queue, the app add the registered users and the redis queue pops and executed the email sending.
         # the background worker will handle the email sending and redis will hold the queue
         # we want to do it so we dont overload on the api.
-        response = current_app.queue.enqueue(tasks.send_user_registration_email, user.email, user.username)
+        current_app.queue.enqueue(tasks.send_user_registration_email, user.email, user.username)
         # here we send the worker to run the function
-
-        print('Send email with response of: ', response)
 
         return {"message": "User created successfully"}, 201 # 4. if successful return message
 

@@ -24,4 +24,5 @@ def send_user_registration_email(email, username):
     response = send_simple_message(to = email,
                                    subject = "Successfully Signed Up",
                                    body = f"Hello {username} - Welcome To The REST API")
+    print('Sent email and response: ', response)
     return response
