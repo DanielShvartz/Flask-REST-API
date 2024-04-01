@@ -99,3 +99,8 @@ class UserSchema(Schema):
     username = fields.String(required=True)
     password = fields.String(required=True, load_only=True) # dont return the password in serialization ever, return only user related data
     id = fields.Integer(dump_only=True) # return ID when created
+
+# Deserialization: username, password, email
+# Serialization: username, ID
+class UserRegisterSchema(UserSchema): # the user register schema uses the same fields of user schema but add an email.
+    email = fields.String(required=True)

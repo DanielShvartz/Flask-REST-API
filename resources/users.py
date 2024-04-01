@@ -1,3 +1,6 @@
+import requests
+import os
+
 from email import message
 from xml.dom import UserDataHandler
 from flask.views import MethodView
@@ -11,18 +14,33 @@ from flask_jwt_extended import create_access_token, get_jwt, jwt_required, creat
 
 from db import db
 from models import UserModel, BlocklistModel, blocklist # to access db for users we need to import the usermodel db
-from schemas import UserSchema # to serialize and deserialize the user incoming data
+from schemas import UserSchema, UserRegisterSchema # to serialize and deserialize the user incoming data
 
 blp = Blueprint("Users", __name__, description="Operations on users")
+
+
+def send_simple_message(to, subject, body):
+    
+    domain = os.getenv("MAILGUN_API_DOMAIN")
+    api_key = os.getenv("MAILGUN_API_KEY")
+    
+    return requests.post(
+        f"https://api.mailgun.net/v3/{domain}/messages",
+        auth=("api", api_key),
+        data={"from": f"Daniel Shvartz <mailgun@{domain}>",
+              "to": [to],
+              "subject": subject,
+              "text": body})
 
 @blp.route('/register')
 class RegisterUser(MethodView):
 
-    @blp.arguments(UserSchema) # we get username and password
+    @blp.arguments(UserRegisterSchema) # we get username and password and email
     def post(self, register_user_data): #  1. get the username and password as json from the user
 
-        # we could check if the user is already registered like so:
-        # if UserModel.query.filter(UserModel.username == register_user_data['username']).first():
+        # we could check if the user is already registered like so: # from sqlalchemy import or_
+        # if UserModel.query.filter(or_(UserModel.username == register_user_data['username'],
+        # UserModel.email == register_user_data['email'])).first():
             # abort(409, message="User already registered.")
         # But this is not needed because we set the username as unique, so if we try to insert it to the db we will get an IntegrityError
         # So if we get an Intergrity error we know that the user with that username already exists
@@ -30,17 +48,28 @@ class RegisterUser(MethodView):
 
         # 2. create a user and hash the password
         password = register_user_data['password']
-        user = UserModel(username=register_user_data['username'], password=pbkdf2_sha256.hash(password))
+        email = register_user_data['email']
+        username = register_user_data['username']
+
+        user = UserModel(email=email, username=username, password=pbkdf2_sha256.hash(password))
 
         try:
             db.session.add(user)
             db.session.commit()
         except IntegrityError:
-            abort(409, message='User already exists.') # 3. if the user already exists we will get an integrity error
+            abort(409, message='User already exists or email already used.') # 3. if the user already exists we will get an integrity error
         except SQLAlchemyError:
              abort(500, message="An error occurred while creating the user")
 
+        # After the user has create successfully, send email with documentation.
+        response = send_simple_message(to=user.email, subject="Successfully Signed Up", body = f"Hello {user.username} - Welcome To The REST API")
+        # usually we would not want to use the app to send emails, so we need to set a redis queue.
+        # at this queue, the app add the registered users and the redis queue pops and executed the email sending.
+        # the background worker will handle the email sending and redis will hold the queue
+        # we want to do it so we dont overload on the api.
+
         return {"message": "User created successfully"}, 201 # 4. if successful return message
+
 
 
 # NOTE - TESTING ONLY

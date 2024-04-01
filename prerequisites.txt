@@ -81,3 +81,17 @@ to run the app
 then at the dockerfile:
 CMD ["/bin/bash", "docker-entrypoint.sh"]
 to tell docker to run the migration
+
+we can also create a database for local development, so in the .env file i would put the url for the local db, and wont use sqlite
+and for the production database give another link, but at this project i have used same db for both
+
+to send mails:
+use mail gun.
+
+if we want the user endpoints to send emails, we need to add a function there, and so on any other endpoint file.
+if needed:
+1. add email to db
+2. migrate + upgrade (down forget to set name at the migration file so we can also downgrade)
+3. add schema if needed
+4. update endpoint to have that schema and parse 
+5. call email sending function
