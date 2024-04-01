@@ -103,3 +103,7 @@ docker run --name=api_worker -it api_local sh -c"rq worker -u redis_url queue_na
 -u - where to connection, and the queue name.
 we need to run both the worker from redis, which will handle the emails sending
 and the api it self.
+
+to deploy everything:
+create a settings.py file, and there put the rq configuration settings.
+we dont want to pass the redis name and the url so we save it in the file.
