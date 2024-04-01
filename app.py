@@ -12,9 +12,11 @@ from resources.users import blp as UserBluePrint
 
 from db import db
 import models # inside-> StoreModel and ItemModel.  The models are needed to be declared before the init of sqlalchemy so it will know which models are available
+
 import os
 from dotenv import load_dotenv
-
+import redis
+from rq import Queue
 """ 
 NOTE:
 There are two parts of the flask route: the endpoint decorator and the function that should run
@@ -34,6 +36,9 @@ def create_app(db_url=None):
 
     app = Flask(__name__) # This creates a flask instance/app, allows us to also run the app
     load_dotenv() # load environment variables
+
+    connection = redis.from_url(os.getenv("REDIS_URL")) # create a connection to redis
+    app.queue = Queue('Emails', connection=connection)
 
     # Register blueprints with the api
     app.config["PROPAGATE_EXCEPTIONS"] = True # if there is an exception - propagate it to the main app so we can see it

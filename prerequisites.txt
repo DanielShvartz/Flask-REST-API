@@ -95,3 +95,5 @@ if needed:
 3. add schema if needed
 4. update endpoint to have that schema and parse 
 5. call email sending function
+
+to add a redis instance take the redis url and add it to the .env

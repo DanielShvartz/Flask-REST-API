@@ -1,6 +1,3 @@
-import requests
-import os
-
 from email import message
 from xml.dom import UserDataHandler
 from flask.views import MethodView
@@ -16,21 +13,11 @@ from db import db
 from models import UserModel, BlocklistModel, blocklist # to access db for users we need to import the usermodel db
 from schemas import UserSchema, UserRegisterSchema # to serialize and deserialize the user incoming data
 
+import tasks
+from flask import current_app
+
 blp = Blueprint("Users", __name__, description="Operations on users")
 
-
-def send_simple_message(to, subject, body):
-    
-    domain = os.getenv("MAILGUN_API_DOMAIN")
-    api_key = os.getenv("MAILGUN_API_KEY")
-    
-    return requests.post(
-        f"https://api.mailgun.net/v3/{domain}/messages",
-        auth=("api", api_key),
-        data={"from": f"Daniel Shvartz <mailgun@{domain}>",
-              "to": [to],
-              "subject": subject,
-              "text": body})
 
 @blp.route('/register')
 class RegisterUser(MethodView):
@@ -61,12 +48,16 @@ class RegisterUser(MethodView):
         except SQLAlchemyError:
              abort(500, message="An error occurred while creating the user")
 
-        # After the user has create successfully, send email with documentation.
-        response = send_simple_message(to=user.email, subject="Successfully Signed Up", body = f"Hello {user.username} - Welcome To The REST API")
+        # After the user has create successfully, send email with documentation:
+             
         # usually we would not want to use the app to send emails, so we need to set a redis queue.
         # at this queue, the app add the registered users and the redis queue pops and executed the email sending.
         # the background worker will handle the email sending and redis will hold the queue
         # we want to do it so we dont overload on the api.
+        response = current_app.queue.enqueue(tasks.send_user_registration_email, user.email, user.username)
+        # here we send the worker to run the function
+
+        print('Send email with response of: ', response)
 
         return {"message": "User created successfully"}, 201 # 4. if successful return message
 
